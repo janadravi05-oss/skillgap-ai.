@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SkillGap AI</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#07111f;
+    color:#fff;
+}
+
+header{
+    padding:22px 7%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0b1729;
+    border-bottom:1px solid #20324c;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+    color:#48e6ff;
+}
+
+.logo span{color:#a855f7}
+
+nav a{
+    color:#ccc;
+    margin-left:20px;
+    text-decoration:none;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:35px auto;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.hero h1{
+    font-size:45px;
+    margin:10px;
+    background:linear-gradient(90deg,#42e8ff,#a855f7);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.hero p{
+    color:#9eb0c8;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.card{
+    background:#0d1b2d;
+    border:1px solid #203957;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 40px #0005;
+}
+
+.card h2{
+    margin-top:0;
+    color:#55eaff;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    color:#b8c7d9;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    margin-top:7px;
+    border-radius:9px;
+    border:1px solid #34506f;
+    background:#081525;
+    color:white;
+    outline:none;
+}
+
+.skills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:15px;
+}
+
+.skill{
+    background:#162b45;
+    border:1px solid #315275;
+    padding:8px 12px;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+.skill.active{
+    background:#1e91a9;
+    border-color:#54efff;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:20px;
+    border:0;
+    border-radius:10px;
+    background:linear-gradient(90deg,#00d9ff,#8b5cf6);
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px #00d9ff55;
+}
+
+/* Results */
+
+#results{
+    display:none;
+    margin-top:30px;
+}
+
+.scoreBox{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    padding:25px;
+}
+
+.score{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+    font-weight:bold;
+    background:
+      radial-gradient(#0d1b2d 58%,transparent 59%),
+      conic-gradient(#00e5ff var(--score),#20324c 0);
+}
+
+.badge{
+    display:inline-block;
+    padding:7px 12px;
+    margin:5px;
+    border-radius:15px;
+    background:#162d47;
+}
+
+.missing{
+    border-left:4px solid #ff5277;
+    padding:10px 15px;
+    margin:10px 0;
+    background:#1a1724;
+}
+
+.recommend{
+    border-left:4px solid #4ade80;
+    padding:10px 15px;
+    margin:10px 0;
+    background:#10251d;
+}
+
+.roadmap{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.week{
+    background:#101f34;
+    padding:15px;
+    border-radius:12px;
+    border-top:3px solid #a855f7;
+}
+
+.ai{
+    background:linear-gradient(135deg,#101e38,#1d1040);
+    border:1px solid #7048c8;
+}
+
+.progress{
+    width:100%;
+    height:12px;
+    background:#1a2a40;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress div{
+    height:100%;
+    background:linear-gradient(90deg,#00e5ff,#a855f7);
+}
+
+footer{
+    text-align:center;
+    color:#73869d;
+    padding:30px;
+}
+
+@media(max-width:800px){
+    .grid{grid-template-columns:1fr}
+    .roadmap{grid-template-columns:1fr 1fr}
+    .hero h1{font-size:32px}
+}
+
+@media(max-width:500px){
+    .roadmap{grid-template-columns:1fr}
+    nav{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillGap<span>AI</span> 🤖</div>
+
+    <nav>
+        <a href="#">Home</a>
+        <a href="#analyze">Analyze</a>
+        <a href="#results">Results</a>
+    </nav>
+</header>
+
+<div class="container">
+
+<section class="hero">
+    <h1>AI Skill Gap Analyzer</h1>
+    <p>
+        Discover the skills you need for your dream career.
+        Build a personalized learning roadmap.
+    </p>
+</section>
+
+<section id="analyze" class="grid">
+
+<!-- USER PROFILE -->
+
+<div class="card">
+
+<h2>👤 Your Profile</h2>
+
+<label>Your Name</label>
+<input id="name" placeholder="Enter your name">
+
+<label>Target Career</label>
+
+<select id="career">
+
+<option value="web">Full Stack Developer</option>
+<option value="ai">AI / ML Engineer</option>
+<option value="data">Data Scientist</option>
+<option value="cyber">Cybersecurity Analyst</option>
+<option value="cloud">Cloud Engineer</option>
+<option value="app">Android Developer</option>
+
+</select>
+
+<label>Experience</label>
+
+<select id="experience">
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+
+<h3>Your Skills</h3>
+
+<div class="skills">
+
+<span class="skill" onclick="toggleSkill(this)">HTML</span>
+<span class="skill" onclick="toggleSkill(this)">CSS</span>
+<span class="skill" onclick="toggleSkill(this)">JavaScript</span>
+<span class="skill" onclick="toggleSkill(this)">React</span>
+<span class="skill" onclick="toggleSkill(this)">Node.js</span>
+<span class="skill" onclick="toggleSkill(this)">Python</span>
+<span class="skill" onclick="toggleSkill(this)">Java</span>
+<span class="skill" onclick="toggleSkill(this)">SQL</span>
+<span class="skill" onclick="toggleSkill(this)">Git</span>
+<span class="skill" onclick="toggleSkill(this)">Docker</span>
+<span class="skill" onclick="toggleSkill(this)">AWS</span>
+<span class="skill" onclick="toggleSkill(this)">Machine Learning</span>
+<span class="skill" onclick="toggleSkill(this)">TensorFlow</span>
+<span class="skill" onclick="toggleSkill(this)">Cybersecurity</span>
+<span class="skill" onclick="toggleSkill(this)">Linux</span>
+
+</div>
+
+<button onclick="analyzeSkills()">
+🚀 Analyze My Skill Gap
+</button>
+
+</div>
+
+<!-- JOB REQUIREMENTS -->
+
+<div class="card">
+
+<h2>🎯 Target Role</h2>
+
+<div id="roleInfo">
+    <p>Select a career to see the required skills.</p>
+</div>
+
+<hr>
+
+<h3>📊 Skill Requirements</h3>
+
+<div id="requiredSkills"></div>
+
+</div>
+
+</section>
+
+<!-- RESULTS -->
+
+<section id="results">
+
+<div class="card ai">
+
+<h2>🤖 AI Career Analysis</h2>
+
+<p id="aiMessage"></p>
+
+</div>
+
+<div class="grid">
+
+<div class="card scoreBox">
+
+<h2>Skill Match</h2>
+
+<div class="score" id="score">
+0%
+</div>
+
+<p id="scoreText"></p>
+
+</div>
+
+<div class="card">
+
+<h2>📈 Progress</h2>
+
+<p>Current Skill Level</p>
+
+<div class="progress">
+<div id="progress"></div>
+</div>
+
+<p id="progressText"></p>
+
+<h3>Career Readiness</h3>
+
+<p id="readiness"></p>
+
+</div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>❌ Skill Gaps</h2>
+
+<div id="missingSkills"></div>
+
+</div>
+
+<div class="card">
+
+<h2>✅ Your Strengths</h2>
+
+<div id="strengths"></div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📚 Recommended Learning</h2>
+
+<div id="recommendations"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🗺️ Personalized Roadmap</h2>
+
+<div class="roadmap" id="roadmap"></div>
+
+</div>
+
+</section>
+
+</div>
+
+<footer>
+    SkillGap AI • Free Career Intelligence Tool
+</footer>
+
+<script>
+
+/* Career database */
+
+const careers = {
+
+web:{
+name:"Full Stack Developer",
+skills:[
+"HTML","CSS","JavaScript","React",
+"Node.js","SQL","Git","Docker"
+]
+},
+
+ai:{
+name:"AI / ML Engineer",
+skills:[
+"Python","SQL","Machine Learning",
+"TensorFlow","Git","Docker","Linux"
+]
+},
+
+data:{
+name:"Data Scientist",
+skills:[
+"Python","SQL","Machine Learning",
+"Git","Linux"
+]
+},
+
+cyber:{
+name:"Cybersecurity Analyst",
+skills:[
+"Linux","Python","Cybersecurity",
+"SQL","Git"
+]
+},
+
+cloud:{
+name:"Cloud Engineer",
+skills:[
+"Linux","Docker","AWS","Python","Git"
+]
+},
+
+app:{
+name:"Android Developer",
+skills:[
+"Java","Python","Git","SQL"
+]
+}
+
+};
+
+
+/* Skill selection */
+
+function toggleSkill(element){
+
+    element.classList.toggle("active");
+
+    updateRole();
+
+}
+
+
+/* Update role information */
+
+function updateRole(){
+
+    const career =
+        document.getElementById("career").value;
+
+    const role = careers[career];
+
+    document.getElementById("roleInfo").innerHTML = `
+        <h3>${role.name}</h3>
+        <p>
+        Recommended skills for this career:
+        </p>
+    `;
+
+    document.getElementById("requiredSkills").innerHTML =
+        role.skills
+        .map(skill => `<span class="badge">${skill}</span>`)
+        .join("");
+
+}
+
+
+/* Analyze */
+
+function analyzeSkills(){
+
+    const career =
+        document.getElementById("career").value;
+
+    const role = careers[career];
+
+    const selected =
+        [...document.querySelectorAll(".skill.active")]
+        .map(x => x.innerText);
+
+    const required = role.skills;
+
+    const strengths =
+        required.filter(skill =>
+            selected.includes(skill)
+        );
+
+    const missing =
+        required.filter(skill =>
+            !selected.includes(skill)
+        );
+
+    const score =
+        Math.round(
+            (strengths.length / required.length) * 100
+        );
+
+    /* Show results */
+
+    document.getElementById("results").style.display =
+        "block";
+
+    document.getElementById("score").style.setProperty(
+        "--score",
+        score + "%"
+    );
+
+    document.getElementById("score").innerText =
+        score + "%";
+
+    document.getElementById("progress").style.width =
+        score + "%";
+
+    document.getElementById("progressText").innerText =
+        score + "% of required skills matched.";
+
+    /* Score text */
+
+    let level;
+
+    if(score >= 80)
+        level = "Excellent";
+    else if(score >= 60)
+        level = "Good";
+    else if(score >= 40)
+        level = "Developing";
+    else
+        level = "Beginner";
+
+    document.getElementById("scoreText").innerText =
+        "Skill Level: " + level;
+
+    document.getElementById("readiness").innerHTML =
+        "<strong>" + level +
+        "</strong> — keep developing the missing skills.";
+
+    /* AI message */
+
+    const name =
+        document.getElementById("name").value ||
+        "Candidate";
+
+    document.getElementById("aiMessage").innerHTML =
+
+        `Hello <strong>${name}</strong>! 👋
+        Based on your selected skills, your current match
+        for <strong>${role.name}</strong> is
+        <strong>${score}%</strong>.
+        You already have ${strengths.length}
+        important skills and should focus on
+        ${missing.length} remaining skills.`;
+
+    /* Missing */
+
+    document.getElementById("missingSkills").innerHTML =
+        missing.length
+        ? missing.map(skill =>
+            `<div class="missing">
+                ❌ <strong>${skill}</strong>
+                <br>
+                <small>Recommended for ${role.name}</small>
+            </div>`
+          ).join("")
+        : "<p>🎉 No major skill gaps!</p>";
+
+    /* Strengths */
+
+    document.getElementById("strengths").innerHTML =
+        strengths.length
+        ? strengths.map(skill =>
+            `<span class="badge">✓ ${skill}</span>`
+          ).join("")
+        : "<p>No matching skills selected yet.</p>";
+
+    /* Recommendations */
+
+    document.getElementById("recommendations").innerHTML =
+        missing.length
+        ? missing.map((skill,i) =>
+            `<div class="recommend">
+                <strong>${i+1}. Learn ${skill}</strong>
+                <p>
+                Practice projects, tutorials and
+                hands-on exercises related to ${skill}.
+                </p>
+            </div>`
+          ).join("")
+        : "<div class='recommend'>You are ready to build projects for this role! 🚀</div>";
+
+    /* Roadmap */
+
+    createRoadmap(missing);
+
+    document.getElementById("results")
+        .scrollIntoView({behavior:"smooth"});
+
+}
+
+
+/* Roadmap */
+
+function createRoadmap(missing){
+
+    const roadmap =
+        document.getElementById("roadmap");
+
+    const groups = [
+
+        missing.slice(0,2),
+        missing.slice(2,4),
+        missing.slice(4,6),
+        missing.slice(6,8)
+
+    ];
+
+    roadmap.innerHTML =
+        groups.map((group,index)=>`
+
+        <div class="week">
+
+            <h3>Week ${index+1}</h3>
+
+            ${
+                group.length
+                ? group.map(x =>
+                    `<p>📘 ${x}</p>`
+                  ).join("")
+                : "<p>🎯 Build a project</p>"
+            }
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* Career selector */
+
+document
+.getElementById("career")
+.addEventListener("change",updateRole);
+
+
+/* Initial */
+
+updateRole();
+
+</script>
+
+</body>
+</html>
